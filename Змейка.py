@@ -53,7 +53,7 @@ def next_turn(snake, food):
     global score 
     global SPEED
     score += 1
-    SPEED -= 5
+    SPEED -= 2
 
     label.config(text="Счёт: {}".format(score))
     canvas.delete("food")
