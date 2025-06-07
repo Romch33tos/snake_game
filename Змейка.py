@@ -29,10 +29,11 @@ class Food:
       if not overlap:
         break
     color = SPECIAL_FOOD_COLOUR if special else FOOD_COLOUR
-    canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=color, tag="food")
+    tag = "special_food" if special else "food"
+    canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=color, tag=tag)
 
 def next_turn(snake, food):
-  global score, SPEED, special_food
+  global score, SPEED, special_food, special_food_timer
 
   x, y = snake.coordinates[0]
 
@@ -55,14 +56,21 @@ def next_turn(snake, food):
     label.config(text="Счёт: {}".format(score))
     canvas.delete("food")
     food = Food(snake)
+
     if score % 5 == 0:
+      if special_food_timer:
+        window.after_cancel(special_food_timer)
       canvas.delete("special_food")
       special_food = Food(snake, special=True)
+      special_food_timer = window.after(5000, remove_special_food)
   elif special_food and x == special_food.coordinates[0] and y == special_food.coordinates[1]:
     score += 10
     label.config(text="Счёт: {}".format(score))
-    canvas.delete("food")
+    canvas.delete("special_food")
+    if special_food_timer:
+      window.after_cancel(special_food_timer)
     special_food = None
+    special_food_timer = None
     food = Food(snake)
   else:
     del snake.coordinates[-1]
@@ -74,8 +82,14 @@ def next_turn(snake, food):
   else:
     window.after(SPEED, next_turn, snake, food)
 
+def remove_special_food():
+  global special_food, special_food_timer
+  canvas.delete("special_food")
+  special_food = None
+  special_food_timer = None
+
 def change_direction(new_direction):
-  global direction
+  global direction 
   if new_direction == 'left' and direction != 'right':
     direction = new_direction
   elif new_direction == 'right' and direction != 'left':
@@ -97,16 +111,22 @@ def check_collisions(snake):
   return False
 
 def game_over():
+  global special_food_timer
+  if special_food_timer:
+    window.after_cancel(special_food_timer)
   canvas.delete(ALL)
-  canvas.create_text(canvas.winfo_width() / 2, canvas.winfo_height() / 2, font=('Arial', 16), text="Конец игры!", fill="black", tag="gameover")
+  canvas.create_text(canvas.winfo_width()/2, canvas.winfo_height()/2, font=('Arial', 16), text="Конец игры!", fill="black", tag="gameover")
   canvas.bind("<ButtonPress-1>", start_game)
 
 def start_game(event=None):
-  global direction, score, SPEED, special_food
+  global direction, score, SPEED, special_food, special_food_timer
   score = 0
   SPEED = 250
   direction = "down"
   special_food = None
+  if special_food_timer:
+    window.after_cancel(special_food_timer)
+  special_food_timer = None
   label.config(text="Счёт: {}".format(score))
   canvas.delete(ALL)
   canvas.unbind("<ButtonPress-1>")
@@ -122,6 +142,7 @@ score = 0
 direction = 'down'
 SPEED = 250
 special_food = None
+special_food_timer = None
 
 GAME_WIDTH = 330
 GAME_HEIGHT = 330
