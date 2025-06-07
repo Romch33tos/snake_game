@@ -21,20 +21,23 @@ class Food:
       x = random.randint(0, (GAME_WIDTH // SPACE_SIZE) - 1) * SPACE_SIZE
       y = random.randint(0, (GAME_HEIGHT // SPACE_SIZE) - 1) * SPACE_SIZE
       self.coordinates = [x, y]
+      
       overlap = False
       for coord in snake.coordinates:
         if coord[0] == x and coord[1] == y:
           overlap = True
           break
+          
       if not overlap:
         break
+        
     color = SPECIAL_FOOD_COLOUR if special else FOOD_COLOUR
     tag = "special_food" if special else "food"
     canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=color, tag=tag)
 
 def next_turn(snake, food):
   global score, SPEED, special_food, special_food_timer
-
+  
   x, y = snake.coordinates[0]
 
   if direction == 'up':
@@ -56,13 +59,14 @@ def next_turn(snake, food):
     label.config(text="Счёт: {}".format(score))
     canvas.delete("food")
     food = Food(snake)
-
+    
     if score % 5 == 0:
       if special_food_timer:
         window.after_cancel(special_food_timer)
       canvas.delete("special_food")
       special_food = Food(snake, special=True)
       special_food_timer = window.after(5000, remove_special_food)
+  
   elif special_food and x == special_food.coordinates[0] and y == special_food.coordinates[1]:
     score += 10
     label.config(text="Счёт: {}".format(score))
@@ -71,7 +75,6 @@ def next_turn(snake, food):
       window.after_cancel(special_food_timer)
     special_food = None
     special_food_timer = None
-    food = Food(snake)
   else:
     del snake.coordinates[-1]
     canvas.delete(snake.squares[-1])
@@ -101,13 +104,16 @@ def change_direction(new_direction):
 
 def check_collisions(snake):
   x, y = snake.coordinates[0]
+
   if x < 0 or x >= GAME_WIDTH:
     return True
   elif y < 0 or y >= GAME_HEIGHT:
     return True
+  
   for body_part in snake.coordinates[1:]:
     if x == body_part[0] and y == body_part[1]:
       return True
+  
   return False
 
 def game_over():
