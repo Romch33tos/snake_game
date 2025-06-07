@@ -121,7 +121,7 @@ def change_direction(new_direction):
 def check_collisions(snake):
   head_x, head_y = snake.coordinates[0]
   
-  for body_part in snake.coordinates[1:]:
+  for body_part in snake.coordinates[1:-1]:
     if head_x == body_part[0] and head_y == body_part[1]:
       return True
   
