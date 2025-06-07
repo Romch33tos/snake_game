@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Canvas, Label, ALL
 import random
 
 class Snake:
@@ -122,7 +122,7 @@ def game_over():
     window.after_cancel(special_food_timer)
   canvas.delete(ALL)
   canvas.create_text(canvas.winfo_width()/2, canvas.winfo_height()/2, font=('Arial', 16), text="Конец игры!", fill="black", tag="gameover")
-  canvas.bind("<ButtonPress-1>", start_game)
+  window.bind('<space>', start_game)
 
 def start_game(event=None):
   global direction, score, SPEED, special_food, special_food_timer
@@ -135,7 +135,7 @@ def start_game(event=None):
   special_food_timer = None
   label.config(text="Счёт: {}".format(score))
   canvas.delete(ALL)
-  canvas.unbind("<ButtonPress-1>")
+  window.unbind('<space>')
   snake = Snake()
   food = Food(snake)
   next_turn(snake, food)
@@ -164,14 +164,13 @@ label.pack(padx=20, pady=5, anchor="e")
 
 canvas = Canvas(window, bg=BACKGROUND_COLOUR, height=GAME_HEIGHT, width=GAME_WIDTH)
 canvas.pack()
-canvas.create_text(GAME_WIDTH/2, GAME_HEIGHT/2, anchor="c", text="Кликни, чтобы начать игру!", fill="#000000", font=('Arial', 16), tag="start")
+canvas.create_text(GAME_WIDTH/2, GAME_HEIGHT/2, anchor="c", text="Нажмите пробел,\nчтобы начать игру!", fill="#000000", font=('Arial', 16), tag="start", justify = "center")
 
 window.bind('<Left>', lambda event: change_direction('left'))
 window.bind('<Right>', lambda event: change_direction('right'))
 window.bind('<Up>', lambda event: change_direction('up'))
 window.bind('<Down>', lambda event: change_direction('down'))
-
-canvas.bind("<ButtonPress-1>", start_game)
+window.bind('<space>', start_game)
 
 window.geometry(f"{GAME_WIDTH+40}x{GAME_HEIGHT+70}")
 window.mainloop()
